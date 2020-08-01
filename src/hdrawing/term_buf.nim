@@ -1,6 +1,8 @@
-import seq2d, hprimitives, hgeometry_primitives
+import hmisc/types/[seq2d, hprimitives]
+import hmisc/algo/hmath
+
+import geometry_primitives
 import unicode, sequtils, strutils
-import ../algo/hmath
 
 #*************************************************************************#
 #***************************  terminal buffer  ***************************#

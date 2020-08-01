@@ -1,4 +1,5 @@
-import math, strformat, options, hprimitives
+import math, strformat, options
+import hmisc/types/hprimitives
 
 #*************************************************************************#
 #**************************  Helper functions  ***************************#

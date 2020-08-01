@@ -2,16 +2,16 @@ import sequtils, strutils, math, lenientops, strformat, tables
 import sugar, options
 import unicode
 
-import hprimitives, hgeometry_primitives
-import ../algo/[halgorithm, hseq_mapping]
-import ../types/[seq2d]
+import hdrawing/[geometry_primitives, term_buf]
+import hmisc/algo/[halgorithm, hseq_mapping]
+import hmisc/types/[seq2d, hprimitives]
+import hmisc/helpers
+
 export hprimitives
-import ../helpers
 
-
-import ../hcommon_converters
-export hcommon_converters
-import hterm_buf
+# import ../hcommon_converters
+# export hcommon_converters
+# import hterm_buf
 
 #*************************************************************************#
 #*************************  primitive rendering  *************************#

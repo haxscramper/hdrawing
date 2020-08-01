@@ -8,11 +8,15 @@ import ../src/hdrawing/[
 
 import hmisc/types/[
   hprimitives,
+  seq2d
 ]
 
 import hmisc/algo/halgorithm
 
 #===========================  implementation  ============================#
+
+converter toSeq2D*[T](s: seq[seq[T]]): Seq2d[T] =
+  makeSeq2D(s)
 
 #================================  tests  ================================#
 
