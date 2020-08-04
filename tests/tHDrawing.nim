@@ -1,4 +1,4 @@
-import sugar, strutils, sequtils, strformat, options
+import sugar, strutils, sequtils, strformat, options, terminal
 
 import ../src/hdrawing
 import ../src/hdrawing/[
@@ -8,7 +8,8 @@ import ../src/hdrawing/[
 
 import hmisc/types/[
   hprimitives,
-  seq2d
+  seq2d,
+  colorstring
 ]
 
 import hmisc/algo/halgorithm
@@ -67,7 +68,7 @@ suite "Drawing":
                 @["wer", "2333"],
                 @["1222", "Hello"]
               ].toTermBufGrid(),
-              makeThinLineGridBorders()
+              makeThinLineGridBorders(initPrintStyling(fg = fgRed))
             ).toTermBuf().toString(),
             newTermGrid(
               (0, 0),
@@ -110,7 +111,7 @@ suite "Drawing":
                 some((ms(1, 1), sb("***")))
               ],
             ],
-            makeAsciiGridBorders(),
+            makeAsciiGridBorders(initPrintStyling(fg = fgRed)),
           ).toTermBuf().toString() & "\nSome annotation"))),
           nn
         ],

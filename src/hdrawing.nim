@@ -4,7 +4,7 @@ import unicode
 
 import hdrawing/[geometry_primitives, term_buf]
 import hmisc/algo/[halgorithm, hseq_mapping]
-import hmisc/types/[seq2d, hprimitives]
+import hmisc/types/[seq2d, hprimitives, colorstring]
 import hmisc/helpers
 
 export hprimitives
@@ -17,7 +17,8 @@ export hprimitives
 #*************************  primitive rendering  *************************#
 #*************************************************************************#
 
-func renderLine(x0, y0, x1, y1: int, buf: var TermBuf, rune: Rune): void =
+func renderLine(x0, y0, x1, y1: int, buf: var TermBuf,
+                rune: ColoredRune): void =
   # de x0, y0, x1, y1
   let
     dx = x1 - x0
@@ -35,7 +36,8 @@ func renderLine(x0, y0, x1, y1: int, buf: var TermBuf, rune: Rune): void =
     x += xInc.int
     y += yInc.int
 
-func renderLine*(p: Point[int], w, h: int, buf: var TermBuf, c: Rune): void =
+func renderLine*(p: Point[int], w, h: int, buf: var TermBuf,
+                 c: ColoredRune): void =
   renderLine(
     p.x,
     p.y,
@@ -84,7 +86,7 @@ method render*(line: SLine[char, int], buf: var TermBuf): void =
     x1 = int(line.start.x + cos(line.angle) * line.length),
     y1 = int(line.start.y + sin(line.angle) * line.length),
     buf = buf,
-    rune = line.config
+    rune = initColoredRune(line.config)
   )
 
 func newTermVline*(
@@ -140,7 +142,7 @@ type
     width: Num
     config: T
 
-  TermRectConf* = Table[RectPoint, Rune]
+  TermRectConf* = Table[RectPoint, ColoredRune]
   TermRect* = SRect[TermRectConf, int]
 
 func makeTwoLineRectBorder*(): TermRectConf =
@@ -153,7 +155,8 @@ func makeTwoLineRectBorder*(): TermRectConf =
     rpoTopRight : "╗",
     rpoBottomLeft : "╚",
     rpoBottomRight : "╝",
-  }.mapPairs((lhs, rhs.toRunes()[0])).toTable()
+  }.mapPairs((lhs, initColoredRune(
+    rhs.toRunes()[0]))).toTable()
 
 func newTermRect*(
   start: (int, int),
@@ -178,14 +181,16 @@ method render*(rect: SRect[char, int], buf: var TermBuf): void =
   let maxp = rect.start.shiftXY(rect.width, rect.height)
   buf.reserve(maxp.y, maxp.x)
   renderLine(
-    rect.start, rect.width, 0, buf, rect.config)
+    rect.start, rect.width, 0, buf, rect.config.toColored())
   renderLine(
-    rect.start, 0, rect.height - 1, buf, rect.config)
+    rect.start, 0, rect.height - 1, buf, rect.config.toColored())
 
   renderLine(
-    rect.start.shiftY(rect.height - 1), rect.width, 0, buf, rect.config)
+    rect.start.shiftY(rect.height - 1), rect.width, 0, buf,
+    rect.config.toColored())
   renderLine(
-    rect.start.shiftX(rect.width), 0, rect.height - 1, buf, rect.config)
+    rect.start.shiftX(rect.width), 0, rect.height - 1, buf,
+    rect.config.toColored())
 
 func rectRenderAux(
   start: Point[int], height, width: int, config: TermRectConf,
@@ -323,12 +328,13 @@ type
     cellHeights: seq[Num]
     config: T
 
-  TermGridConf* = Table[GridPoint, Rune]
+  TermGridConf* = Table[GridPoint, ColoredRune]
   TermGrid* = SGrid[TermGridConf, int]
 
 
 
-func makeThinLineGridBorders*(): TermGridConf =
+func makeThinLineGridBorders*(
+  styling: PrintStyling = initPrintStyling()): TermGridConf =
   {
     gpoIntersection : "┼",
     gpoTopLeft : "┌",
@@ -345,10 +351,11 @@ func makeThinLineGridBorders*(): TermGridConf =
     gpoBottomIntersection : "┴",
     gpoHorizontalGap : "─",
     gpoVerticalGap : "│",
-  }.mapPairs((lhs, rhs.toRunes()[0])).toTable()
+  }.mapPairs((lhs, initColoredRune(rhs.toRunes()[0], styling))).toTable()
 
 
-func makeAsciiGridBorders*(): TermGridConf =
+func makeAsciiGridBorders*(
+  styling: PrintStyling = initPrintStyling()): TermGridConf =
   {
     gpoIntersection : "+",
     gpoTopLeft : "+",
@@ -365,7 +372,7 @@ func makeAsciiGridBorders*(): TermGridConf =
     gpoBottomIntersection : "+",
     gpoHorizontalGap : "-",
     gpoVerticalGap : "|",
-  }.mapPairs((lhs, rhs.toRunes()[0])).toTable()
+  }.mapPairs((lhs, initColoredRune(rhs.toRunes()[0], styling))).toTable()
 
 func spacingDimensions*(rc: TermGridConf): tuple[
   vSpacing, hSpacing, left, right, top, bottom: int] =

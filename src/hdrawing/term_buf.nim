@@ -1,4 +1,4 @@
-import hmisc/types/[seq2d, hprimitives]
+import hmisc/types/[seq2d, hprimitives, colorstring]
 import hmisc/algo/hmath
 
 import geometry_primitives
@@ -13,7 +13,7 @@ type
     nil
 
   TermBuf* = object
-    buf: Seq2d[Rune]
+    buf: Seq2d[ColoredRune]
     xDiff: int
     yDiff: int
 
@@ -26,23 +26,28 @@ func height*(buf: TermBuf): int = buf.buf.rowNum()
 
 #============================  constructors  =============================#
 
+func toColored*(grid: Seq2D[Rune]): Seq2D[ColoredRune] =
+  grid.mapIt2D(initColoredRune(it))
+
 func toTermBufFast*(str: string): TermBuf =
   ## Create new term buffer without checking for newlines.
   ##
-  ## WARN: use only when there is no newlines in input string,
-  ## otherwise it will look like garbage in terminal.
-  TermBuf(buf: makeSeq2D(str.toRunes()))
+  ## WARN: use only when there is no newlines or escape sequences in
+  ## input string, otherwise it will look like garbage in terminal.
+  TermBuf(buf: makeSeq2D(str.toRunes()).toColored())
+
+# func makeTermBuf()
 
 func toTermBuf*(str: string): TermBuf =
-  TermBuf(buf: str.split("\n").mapIt(
-    it.toRunes()).makeSeq2D(whitespaceRune))
+  TermBuf(buf: str.toColoredRuneGrid().makeSeq2D(coloredWhitespaceRune))
 
 
 # func toTermBuf*(rows: seq[string]): TermBuf =
 #   TermBuf(buf: rows.mapIt(it.toRunes()).makeSeq2D(whitespaceRune))
 
 func toTermBuf*(strs: seq[seq[string]]): TermBuf =
-  TermBuf(buf: strs.mapIt(it.toRunes().concat()).makeSeq2D(whitespaceRune))
+  TermBuf(buf: strs.mapIt(it.toRunes().concat()
+  ).makeSeq2D(whitespaceRune).toColored())
 
 func toTermBufGrid*(strs: seq[seq[string]]): Seq2D[TermBuf] =
   strs.makeSeq2D("").mapIt2D(it.toTermBuf())
@@ -65,29 +70,42 @@ func concatBufsLeft*(bufs: seq[TermBuf]): TermBuf =
   toTermBuf(@[bufs])
 
 func toTermBuf*(strs: StrBlock): TermBuf =
-  TermBuf(buf: strs.mapIt(it.toRunes()).makeSeq2D(whitespaceRune))
+  TermBuf(buf: strs.mapIt(it.toRunes()).makeSeq2D(
+    whitespaceRune).toColored())
 
 func toTermBuf*(strs: RuneBlock): TermBuf =
-  TermBuf(buf: strs.makeSeq2D(whitespaceRune))
+  TermBuf(buf: strs.makeSeq2D(whitespaceRune).toColored())
 
 func newBuf*(offset: (int, int) = (0, 0)): TermBuf =
   TermBuf(xDiff: offset[0], yDiff: offset[1])
+
+# func concatBufsLeft*(bufs: seq[string]): string =
+#   toTermBuf(bufs.mapIt(it.toTErmBuf()))
 
 #==============================  accessors  ==============================#
 
 func reserve*(buf: var TermBuf, rows, cols: int): void =
   buf.buf.fillToSize(
     makeArrSize(w = cols + 1, h = rows + 1),
-    whitespaceRune)
+    coloredWhitespaceRune)
 
-func setAtPoint(buf: var TermBuf, row, col: int, rune: Rune): void =
+func `[]=`*(buf: var Seq2D[ColoredRune], row, col: int, rune: Rune): void =
+    buf[row, col] = initColoredRune(rune)
+
+func setAtPoint(buf: var TermBuf, row, col: int, rune: ColoredRune): void =
   reserve(buf, row, col)
   buf.buf[row, col] = rune
 
-func `[]=`*(buf: var TermBuf, x, y: int, rune: Rune): void =
+func `[]=`*(buf: var TermBuf, x, y: int, rune: ColoredRune): void =
   let y = y + buf.yDiff
   let x = x + buf.xDiff
   buf.setAtPoint(y, x, rune)
+
+func `[]=`*(buf: var TermBuf, x, y: int, rune: Rune): void =
+  buf[x, y] = initColoredRune(rune)
+
+func `[]=`*(buf: var TermBuf, pos: Point[int], c: ColoredRune): void =
+  buf[pos.x, pos.y] = c
 
 func `[]=`*(buf: var TermBuf, pos: Point[int], c: Rune): void =
   buf[pos.x, pos.y] = c
@@ -104,7 +122,11 @@ func renderOnto*(buf: TermBuf, other: var TermBuf, pos: Point[int]): void =
 
 #=============================  converters  ==============================#
 
-func toString*(buf: TermBuf): string = buf.buf.join("\n")
+func toString*(buf: TermBuf): string =
+  for idx, row in buf.buf:
+    if idx != 0: result &= "\n"
+    result &= row.toString()
+
 func `$`*(buf: TermBuf): string =
      "cols: " & $buf.buf.usafeColNum() & ", elems: @[" &
        buf.buf.mapIt("\"" & $it & "\"").join(", ") & "]"
