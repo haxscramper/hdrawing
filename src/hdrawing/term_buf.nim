@@ -36,7 +36,8 @@ func toTermBufFast*(str: string): TermBuf =
   ## input string, otherwise it will look like garbage in terminal.
   TermBuf(buf: makeSeq2D(str.toRunes()).toColored())
 
-# func makeTermBuf()
+func makeTermBuf*(w = 2, h = 1): TermBuf =
+  result.buf.fillToSize(rows = h, cols = 2, coloredWhitespaceRune)
 
 func toTermBuf*(str: string): TermBuf =
   TermBuf(buf: str.toColoredRuneGrid().makeSeq2D(coloredWhitespaceRune))
@@ -68,6 +69,9 @@ func toTermBuf*(bufs: seq[TermBuf]): TermBuf =
 
 func concatBufsLeft*(bufs: seq[TermBuf]): TermBuf =
   toTermBuf(@[bufs])
+
+func concatBufsTop*(bufs: seq[TermBuf]): TermBuf =
+  toTermBuf(bufs.mapIt(@[it]))
 
 func toTermBuf*(strs: StrBlock): TermBuf =
   TermBuf(buf: strs.mapIt(it.toRunes()).makeSeq2D(
@@ -125,7 +129,7 @@ func renderOnto*(buf: TermBuf, other: var TermBuf, pos: Point[int]): void =
 func toString*(buf: TermBuf): string =
   for idx, row in buf.buf:
     if idx != 0: result &= "\n"
-    result &= row.toString()
+    result &= row.toString(color = not defined(plainStdout))
 
 func `$`*(buf: TermBuf): string =
      "cols: " & $buf.buf.usafeColNum() & ", elems: @[" &

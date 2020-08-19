@@ -1,0 +1,135 @@
+#+title: readme
+
+Helper for pretty-printing things in terminal. Draw grids, boxes,
+easily concatenate string blocks. Correctly handles unicode and ANSI
+escape codes. Supports multicell grids.
+
+* Example of use
+
+#+begin_src nim
+  import strutils, sequtils, strformat, options
+  import ../src/hdrawing
+  import hmisc/types/[seq2d, colorstring]
+
+
+  var buf = newBuf()
+  newTermText((0,0), @["* (0, 0)".toRunes()]).render(buf)
+  newTermText((8, 5), @["* (5, 5)"]).render(buf)
+  newTermPoint((39, 19)).render(buf)
+  newBoxedTermText(
+    (0, 0), @["Hello world", "Some text", "to render"]
+  ).render(buf)
+  newTermPoint((0, 0), '@').render(buf)
+
+  let w = 10
+  newTermRect((8, 6), w, 5, makeAsciiRectBorder()).render(buf)
+
+  for p in 6 .. 11:
+    newTermText((8 + w, p), @[&"* (5, {p})"]).render(buf)
+
+  newTermText((8, 11), @["12345"]).render(buf)
+
+  newBoxedTermText(
+    (15, 15), @["Text inside", "of unicode box"],
+    makeAsciiRectBorder()
+  ).render(buf)
+  echo buf.toString()
+#+end_src
+
+#+RESULTS:
+#+begin_example
+@#############
+#Hello world #
+#Some text   #
+#to render   #
+##############
+        ,* (5, 5)
+        +--------+* (5, 6)
+        |        |* (5, 7)
+        |        |* (5, 8)
+        |        |* (5, 9)
+        +--------+* (5, 10)
+        12345     * (5, 11)
+
+
+
+               +--------------+
+               |Text inside   |
+               |of unicode box|
+               +--------------+
+                                       +
+#+end_example
+
+
+
+#+begin_src nim
+  import strutils, sequtils, strformat, options
+  import ../src/hdrawing
+  import hmisc/types/[seq2d, colorstring]
+
+  proc ms(a, b: int): auto = makeArrSize(a, b)
+  let nn = none((ArrSize, TermBuf))
+  proc sb(s: string): TermBuf = s.toTermBuf()
+  echo newTermMultiGrid(
+    (0, 0),
+    @[
+      @[
+        some((ms(2, 3), sb("Hello\nWorld\nreallyu long str\ning"))),
+        nn,
+        some((ms(2, 3), sb(newTermMultiGrid(
+          (0, 0),
+          @[
+            @[
+              some((ms(1, 1), sb("222"))),
+              some((ms(1, 1), sb("(((---)))"))),
+              some((ms(1, 1), sb("***)"))),
+              some((ms(1, 1), sb("***")))
+            ],
+            @[
+              some((ms(1, 1), sb("222"))),
+              some((ms(1, 1), sb("((()))"))),
+              some((ms(1, 1), sb("***"))),
+              some((ms(1, 1), sb("***")))
+            ],
+          ],
+          makeAsciiGridBorders(),
+        ).toTermBuf().toString() & "\nSome annotation"))),
+        nn
+      ],
+      @[nn, nn, nn, nn],
+      @[nn, nn, nn, nn
+      ],
+      @[
+        some((ms(1, 1), sb("222"))),
+        some((ms(1, 1), sb("(((---)))"))),
+        some((ms(1, 1), sb("***\n((()))"))),
+        some((ms(1, 1), sb("***")))
+      ],
+      @[
+        some((ms(1, 1), sb("222"))),
+        some((ms(1, 1), sb("((()))"))),
+        some((ms(1, 1), sb("***"))),
+        some((ms(1, 1), sb("***")))
+      ],
+    ],
+    makeAsciiGridBorders(),
+  ).toTermBuf().toString()
+
+#+end_src
+
+#+RESULTS:
+#+begin_example
++----------------+------------------------+
+|Hello           |+---+---------+----+---+|
+|World           ||222|(((---)))|***)|***||
+|reallyu long str|+---+---------+----+---+|
+|ing             ||222|((()))   |*** |***||
+|                |+---+---------+----+---+|
+|                |Some annotation         |
++----+-----------+-------------+----------+
+|222 |(((---)))  |***          |***       |
+|    |           |((()))       |          |
++----+-----------+-------------+----------+
+|222 |((()))     |***          |***       |
++----+-----------+-------------+----------+
+#+end_example

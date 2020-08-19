@@ -7,6 +7,7 @@ import hmisc/algo/[halgorithm, hseq_mapping]
 import hmisc/types/[seq2d, hprimitives, colorstring]
 import hmisc/helpers
 
+export term_buf
 export hprimitives
 
 # import ../hcommon_converters
@@ -158,6 +159,20 @@ func makeTwoLineRectBorder*(): TermRectConf =
   }.mapPairs((lhs, initColoredRune(
     rhs.toRunes()[0]))).toTable()
 
+
+func makeAsciiRectBorder*(): TermRectConf =
+  {
+    rpoLeftEdge : "|",
+    rpoRightEdge : "|",
+    rpoBottomEdge : "-",
+    rpoTopEdge : "-",
+    rpoTopLeft : "+",
+    rpoTopRight : "+",
+    rpoBottomLeft : "+",
+    rpoBottomRight : "+",
+  }.mapPairs((lhs, initColoredRune(
+    rhs.toRunes()[0]))).toTable()
+
 func newTermRect*(
   start: (int, int),
   width, height: int, border: char = '+'): SRect[char, int] =
@@ -249,8 +264,17 @@ type
       of false:
         lines: TermBuf
 
-func width*(text: SText[int]): int = discard #[ IMPLEMENT ]#
-func height*(text: SText[int]): int = discard #[ IMPLEMENT ]#
+func width*(text: SText[int]): int =
+  if text.reflow:
+    text.maxWidth
+  else:
+    text.lines.width()
+
+func height*(text: SText[int]): int =
+  if text.reflow:
+    text.maxHeight
+  else:
+    text.lines.height()
 
 func newTermText*(start: (int, int), text: RuneBlock): SText[int] =
   SText[int](
@@ -266,7 +290,8 @@ func newTermText*(start: (int, int), text: TermBuf): SText[int] =
     reflow: false
   )
 
-func newBoxedTermText*(start: (int, int), text: seq[RuneSeq], boxc: char = '#'): Multishape =
+func newBoxedTermText*(
+  start: (int, int), text: seq[RuneSeq], boxc: char = '#'): Multishape =
   let inner = newTermText(start.shiftXY(1, 1), text)
   Multishape(shapes: @[
     cast[Shape](inner),
@@ -750,3 +775,6 @@ converter toRunes*(s: seq[seq[string]]): seq[seq[RuneSeq]] =
   s.mapIt(it.mapIt(unicode.toRunes(it)))
 converter toRunes*(s: seq[seq[seq[string]]]): seq[seq[seq[RuneSeq]]] =
   s.mapIt(it.mapIt(it.mapIt(unicode.toRunes(it))))
+
+converter toSeq2D*[T](s: seq[seq[T]]): Seq2d[T] =
+  makeSeq2D(s)

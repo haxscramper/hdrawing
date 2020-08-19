@@ -1,17 +1,8 @@
-import sugar, strutils, sequtils, strformat, options, terminal
+# {.define(plainStdout).}
 
+import strutils, sequtils, strformat, options, terminal
 import ../src/hdrawing
-import ../src/hdrawing/[
-  geometry_primitives,
-  term_buf
-]
-
-import hmisc/types/[
-  hprimitives,
-  seq2d,
-  colorstring
-]
-
+import hmisc/types/[seq2d, colorstring]
 import hmisc/algo/halgorithm
 
 #===========================  implementation  ============================#
@@ -29,9 +20,9 @@ suite "Drawing":
       var buf = newBuf()
       newTermText((0,0), @["* (0, 0)".toRunes()]).render(buf)
       newTermText((8, 5), @["* (5, 5)"]).render(buf)
-      newTermPoint((39, 19)).render(buf)
+      # newTermPoint((39, 19)).render(buf)
       newTermVLine((0, 0), 18).render(buf)
-      newTermHLine((0, 0), 38).render(buf)
+      # newTermHLine((0, 0), 38).render(buf)
       newTermPoint((0, 0), '#').render(buf)
       newBoxedTermText(
         (0, 0), @["Hello world", "Some text", "to render"]
@@ -49,7 +40,7 @@ suite "Drawing":
         (15, 15), @["Text inside", "of unicode box"],
         makeTwoLineRectBorder()
       ).render(buf)
-      # echo $buf
+      echo buf.toString()
 
 
     block:
@@ -83,17 +74,17 @@ suite "Drawing":
         ].toTermBufGrid(),
         makeThinLineGridBorders()
       ).render(buf)
-      # echo $buf
+      # echo buf.toString()
 
   test "Multicell grid":
     proc ms(a, b: int): auto = makeArrSize(a, b)
     let nn = none((ArrSize, TermBuf))
     proc sb(s: string): TermBuf = s.toTermBuf()
-    echo newTermMultiGrid(
+    let res = newTermMultiGrid(
       (0, 0),
       @[
         @[
-          some((ms(2, 3), sb("Hello\nWorld\nreallyu long string"))),
+          some((ms(2, 3), sb("Hello\nWorld\nreallyu long str\ning"))),
           nn,
           some((ms(2, 3), sb(newTermMultiGrid(
             (0, 0),
@@ -115,18 +106,8 @@ suite "Drawing":
           ).toTermBuf().toString() & "\nSome annotation"))),
           nn
         ],
-        @[
-          nn,
-          nn,
-          nn,
-          nn
-        ],
-        @[
-          nn,
-          nn,
-          nn,
-          nn
-        ],
+        @[nn, nn, nn, nn],
+        @[nn, nn, nn, nn],
         @[
           some((ms(1, 1), sb("222"))),
           some((ms(1, 1), sb("(((---)))"))),
@@ -142,3 +123,4 @@ suite "Drawing":
       ],
       makeAsciiGridBorders(),
     ).toTermBuf().toString()
+    # echo res
