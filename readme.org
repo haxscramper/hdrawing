@@ -6,9 +6,7 @@ Helper for pretty-printing things in terminal. Draw grids, boxes,
 easily concatenate string blocks. Correctly handles unicode and ANSI
 escape codes. Supports multicell grids.
 
-* Example of use
-
-** Building primitives
+* Primitives
 
 #+begin_src nim :exports both
 withBufEcho:
@@ -35,8 +33,64 @@ withBufEcho:
 :  |of ascii box|
 :  +------------+
 
+* Contribution & development
 
-** Random examples
+The code is mostly just ten layers of ~if/else~ and ~for~ loops nested
+in each other, but if you have any questions about implementation can
+as them on my [[https://discord.gg/ZnBB4E][discord server]] . New features I might add later. Things
+I plan to add:
+
+
+#+caption: Annotations for expressions/parse trees
+#+begin_src text
+  2 + 3   *    4
+  | | |   |    |
+  | | +-Factor-+
+  | |     |
+  +-Expr -+
+#+end_src
+
+#+caption: Parse tree - token mapping
+#+begin_src text
+                      +-----------------------+
++---------------------+Sum -> Sum [+-] Product+-------------------+
+|                     +-----------------------+                   |
+|+--------------+ +----+           +-----------------+            |
+++Sum -> Product++|[+-]|+----------+Product -> Factor+------------+
+|+--------------+|+----+|          +-----------------+            |
+|                |      |                                         |
+0                1      2     3     4      5    6     7     8     9
++----------------+------+-----+-----+-----+-----+-----+-----+-----+
+|       1        |  +   |  (  |  2  |  *  |  3  |  -  |  4  |  )  |
++----------------+------+-----+-----+-----+-----+-----+-----+-----+
+#+end_src
+
+#+caption: Parse tree standalone
+#+begin_src text
+         +-------+
+         | Block |
+         +---+---+
+           +-+--+
+           | If |
+           ++++++
+   +--------+||+------------------+
+   |         |+-------+           |
++--+---+ +---+---+ +--+-----+ +---+---+
+| "if" | | Block | | "else" | | Block |
++------+ +---+---+ +--------+ +---+---+
+           +-+--+             +---+--+
+           | If |             | "{}" |
+           +-++-+             +------+
+        +----++----+
+     +--+---+  +---+---+
+     | "if" |  | Block |
+     +------+  +---+---+
+               +---+--+
+               | "{}" |
+               +------+
+#+end_src
+
+* More Random examples
 
 #+begin_src nim
   import strformat
