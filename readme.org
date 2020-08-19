@@ -33,7 +33,7 @@ withBufEcho:
 :  |of ascii box|
 :  +------------+
 
-* Contribution & development
+* Contribution & development (planned/TODO)
 
 The code is mostly just ten layers of ~if/else~ and ~for~ loops nested
 in each other, but if you have any questions about implementation can
@@ -88,6 +88,24 @@ Parse tree standalone
                +---+--+
                | "{}" |
                +------+
+#+end_src
+
+Embed nested grids into each other
+
+#+begin_src text
+  +-------------------+---+---------+----+-----+
+  |World              |222|(((---)))|***)|***  |
+  |reallyu long string+---+---------+----+-----+
+  |                   |222|((()))   |*** |***  |
+  |                   +---+---------+----+-----+
+  |Hello              | Some annotation        |
+  +------+------------+-------------+----------+
+  |222   |(((---)))   |***          |***       |
+  |      |            |((()))       |          |
+  +------+------------+-------------+----------+
+  |222   |((()))      |***          |***       |
+  +------+------------+-------------+----------+
+
 #+end_src
 
 * More Random examples
