@@ -131,6 +131,13 @@ func toString*(buf: TermBuf): string =
     if idx != 0: result &= "\n"
     result &= row.toString(color = not defined(plainStdout))
 
+template withBufEcho*(body: untyped): untyped =
+  var buf {.inject.} = newBuf()
+
+  body
+
+  echo buf.toString()
+
 func `$`*(buf: TermBuf): string =
      "cols: " & $buf.buf.usafeColNum() & ", elems: @[" &
        buf.buf.mapIt("\"" & $it & "\"").join(", ") & "]"

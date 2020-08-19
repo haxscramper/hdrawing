@@ -17,6 +17,10 @@ import unittest
 suite "Drawing":
   test "test":
     block:
+      withBufEcho:
+        newTermText((0, 0), @["222"]).render(buf)
+
+    block:
       var buf = newBuf()
       newTermText((0,0), @["* (0, 0)".toRunes()]).render(buf)
       newTermText((8, 5), @["* (5, 5)"]).render(buf)
@@ -32,7 +36,7 @@ suite "Drawing":
       newTermRect((8, 6), w, 5, makeTwoLineRectBorder()).render(buf)
 
       for p in 6 ..+ 5:
-        newTermText((8 + w, p), @[&"* (5, {p})"]).render(buf)
+        newTermText((8 + w, p), @[&"* ({8 + w}, {p})"]).render(buf)
 
       newTermText((8, 11), @["12345"]).render(buf)
 

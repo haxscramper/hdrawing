@@ -1,4 +1,6 @@
 #+title: readme
+#+property: header-args:nim+ :flags -d:plainStdout --cc:tcc --hints:off
+#+property: header-args:nim+ :import hdrawing
 
 Helper for pretty-printing things in terminal. Draw grids, boxes,
 easily concatenate string blocks. Correctly handles unicode and ANSI
@@ -6,11 +8,39 @@ escape codes. Supports multicell grids.
 
 * Example of use
 
-#+begin_src nim
-  import strutils, sequtils, strformat, options
-  import ../src/hdrawing
-  import hmisc/types/[seq2d, colorstring]
+** Building primitives
 
+#+begin_src nim :exports both
+withBufEcho:
+  newTermText((1, 1), @["* 222", "    )))"]).render(buf)
+#+end_src
+
+#+RESULTS:
+:
+:  * 222
+:      )))
+
+#+begin_src nim :exports both
+withBufEcho:
+  newBoxedTermText(
+    (1, 1), @["Text inside", "of ascii box"],
+    makeAsciiRectBorder()
+  ).render(buf)
+#+end_src
+
+#+RESULTS:
+:
+:  +------------+
+:  |Text inside |
+:  |of ascii box|
+:  +------------+
+
+
+** Random examples
+
+#+begin_src nim
+  import strformat
+  import hdrawing
 
   var buf = newBuf()
   newTermText((0,0), @["* (0, 0)".toRunes()]).render(buf)
@@ -25,7 +55,7 @@ escape codes. Supports multicell grids.
   newTermRect((8, 6), w, 5, makeAsciiRectBorder()).render(buf)
 
   for p in 6 .. 11:
-    newTermText((8 + w, p), @[&"* (5, {p})"]).render(buf)
+    newTermText((8 + w, p), @[&"* ({8 + w}, {p})"]).render(buf)
 
   newTermText((8, 11), @["12345"]).render(buf)
 
@@ -44,12 +74,12 @@ escape codes. Supports multicell grids.
 #to render   #
 ##############
         ,* (5, 5)
-        +--------+* (5, 6)
-        |        |* (5, 7)
-        |        |* (5, 8)
-        |        |* (5, 9)
-        +--------+* (5, 10)
-        12345     * (5, 11)
+        +--------+* (18, 6)
+        |        |* (18, 7)
+        |        |* (18, 8)
+        |        |* (18, 9)
+        +--------+* (18, 10)
+        12345     * (18, 11)
 
 
 

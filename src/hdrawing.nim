@@ -277,6 +277,7 @@ func height*(text: SText[int]): int =
     text.lines.height()
 
 func newTermText*(start: (int, int), text: RuneBlock): SText[int] =
+  # debugecho start
   SText[int](
     start: makePoint(start[0], start[1]),
     lines: text.toTermBuf(),
