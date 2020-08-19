@@ -37,11 +37,11 @@ withBufEcho:
 
 The code is mostly just ten layers of ~if/else~ and ~for~ loops nested
 in each other, but if you have any questions about implementation can
-as them on my [[https://discord.gg/ZnBB4E][discord server]] . New features I might add later. Things
-I plan to add:
+as them on my [[https://discord.gg/ZnBB4E][discord server]]. New features I might add later. Things I
+plan to add:
 
 
-#+caption: Annotations for expressions/parse trees
+Annotations for expressions/parse trees
 #+begin_src text
   2 + 3   *    4
   | | |   |    |
@@ -50,7 +50,7 @@ I plan to add:
   +-Expr -+
 #+end_src
 
-#+caption: Parse tree - token mapping
+Parse tree - token mapping
 #+begin_src text
                       +-----------------------+
 +---------------------+Sum -> Sum [+-] Product+-------------------+
@@ -65,7 +65,7 @@ I plan to add:
 +----------------+------+-----+-----+-----+-----+-----+-----+-----+
 #+end_src
 
-#+caption: Parse tree standalone
+Parse tree standalone
 #+begin_src text
          +-------+
          | Block |
@@ -92,7 +92,7 @@ I plan to add:
 
 * More Random examples
 
-#+begin_src nim
+#+begin_src nim :exports both
   import strformat
   import hdrawing
 
@@ -146,7 +146,7 @@ I plan to add:
 
 
 
-#+begin_src nim
+#+begin_src nim :exports both
   import strutils, sequtils, strformat, options
   import ../src/hdrawing
   import hmisc/types/[seq2d, colorstring]
