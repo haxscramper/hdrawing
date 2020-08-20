@@ -20,7 +20,7 @@ suite "Drawing":
       withBufEcho:
         newTermText((0, 0), @["222"]).render(buf)
 
-    block:
+    if false:
       var buf = newBuf()
       newTermText((0,0), @["* (0, 0)".toRunes()]).render(buf)
       newTermText((8, 5), @["* (5, 5)"]).render(buf)
@@ -78,7 +78,7 @@ suite "Drawing":
         ].toTermBufGrid(),
         makeThinLineGridBorders()
       ).render(buf)
-      # echo buf.toString()
+      echo buf.toString()
 
   test "Multicell grid":
     proc ms(a, b: int): auto = makeArrSize(a, b)
@@ -127,4 +127,23 @@ suite "Drawing":
       ],
       makeAsciiGridBorders(),
     ).toTermBuf().toString()
-    # echo res
+    echo res
+
+  if true:
+    let buf1 = newTermGridVert(@[
+      "eeeeaf asdf as\nasdfd\ndff",
+      "eeee\nsdfa\ndddd"
+    ]).toStringBlock()
+
+
+    let buf2 = newTermGridVert(@[
+      "eeeeaf asdf as\nasdfd\ndff",
+      "eeee\nsdfa\ndddd"
+    ]).toStringBlock()
+
+    let shape = newTermGridHoriz(@[
+      buf1, buf2
+    ], ' ')
+
+    # echo shape.nthShape().toStringBlock.join("\n")
+    echo shape.toStringBlock().join("\n")

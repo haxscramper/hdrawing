@@ -65,7 +65,11 @@ type
     shapes: seq[Shape]
 
 
-func newMultishape(shapes: seq[Shape]): Multishape = Multishape(shapes: shapes)
+func newMultishape(shapes: seq[Shape]): Multishape =
+  Multishape(shapes: shapes)
+
+func nthShape*(mshape: Multishape, idx: int = 0): Shape =
+  mshape.shapes[idx]
 
 method render*(multi: Multishape, buf: var TermBuf): void =
   for shape in multi.shapes:
@@ -451,9 +455,10 @@ func newTermGrid*(
   let grid = newTermGrid(start, cellws, cellhs, conf)
   let (_, _, left, right, top, bottom) = spacingDimensions(conf)
   let (vSpacing, hSpacing, totalW, totalH) = gridDimensions(grid)
-  let absColPos: seq[int] = grid.cellWidths.cumsumjoin(vSpacing, true)
-  let absRowPos: seq[int] = grid.cellHeights.cumsumjoin(hSpacing, true)
-
+  let absColPos: seq[int] = grid.cellWidths.cumsumjoin(hSpacing, true)
+  let absRowPos: seq[int] = grid.cellHeights.cumsumjoin(vSpacing, true)
+  # echov hSpacing
+  # echov left
   let cellShapes: seq[Shape] = collect(newSeq):
     for (pos, cell) in cells.itercells():
       Shape(newTermText(
@@ -463,6 +468,18 @@ func newTermGrid*(
         ), cell))
 
   newMultishape(@[Shape(grid)] & cellShapes)
+
+func newTermGridVert*(
+  cells: seq[string] | seq[StrBlock], sep: char = '-'): Multishape =
+  newTermGrid((0, 0), cells.mapIt(@[it.toTermBuf()]).makeSeq2D(), {
+    gpoHorizontalGap: toColored(sep)
+  }.toTable())
+
+func newTermGridHoriz*(
+  cells: seq[string] | seq[StrBlock], sep: char = '|'): Multishape =
+  newTermGrid((0, 0), @[cells.mapIt(it.toTermBuf())].makeSeq2D(), {
+    gpoVerticalGap: toColored(sep)
+  }.toTable())
 
 # # REFACTOR remove
 # func newTermGrid*(
