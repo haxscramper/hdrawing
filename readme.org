@@ -6,6 +6,19 @@ Helper for pretty-printing things in terminal. Draw grids, boxes,
 easily concatenate string blocks. Correctly handles unicode and ANSI
 escape codes. Supports multicell grids.
 
+* Installation
+
+#+begin_src bash
+nimble install hdrawing
+#+end_src
+
+* Links
+
+- [[https://github.com/haxscramper/hdrawing][github]]
+- [[https://discord.gg/hjfYJCU][discord server]]
+- [[https://haxscramper.github.io/hdrawing-doc/src/hdrawing.html][documentation]]
+- [[https://nimble.directory/pkg/hdrawing][nimble package]]
+
 * Primitives
 
 #+begin_src nim :exports both
