@@ -776,7 +776,10 @@ method render*(grid: TermMultiGrid, buf: var TermBuf): void =
 
 func toStringBlock*(shape: Shape): seq[string] =
   var buf = newBuf()
-  shape.render(buf)
+
+  {.cast(noSideEffect).}:
+    shape.render(buf)
+
   return buf.toStringBlock()
 
 func toStringBlock*(grid: Seq2D[string]): seq[string] =
@@ -784,13 +787,21 @@ func toStringBlock*(grid: Seq2D[string]): seq[string] =
 
 func toTermBuf*(shape: Shape): TermBuf =
   var buf = newBuf()
-  shape.render(buf)
+
+  {.cast(noSideEffect).}:
+    shape.render(buf)
+
   return buf
 
-converter toRunes*(s: string): RuneSeq = unicode.toRunes(s)
-converter toRunes*(s: seq[string]): seq[RuneSeq] = s.mapIt(unicode.toRunes(it))
+converter toRunes*(s: string): RuneSeq =
+  unicode.toRunes(s)
+
+converter toRunes*(s: seq[string]): seq[RuneSeq] =
+  s.mapIt(unicode.toRunes(it))
+
 converter toRunes*(s: seq[seq[string]]): seq[seq[RuneSeq]] =
   s.mapIt(it.mapIt(unicode.toRunes(it)))
+
 converter toRunes*(s: seq[seq[seq[string]]]): seq[seq[seq[RuneSeq]]] =
   s.mapIt(it.mapIt(it.mapIt(unicode.toRunes(it))))
 

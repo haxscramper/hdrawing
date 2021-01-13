@@ -150,7 +150,9 @@ func toTermBuf*(bufs: Seq2D[TermBuf]): TermBuf =
   ## Merge multiple string buffers together
   if (bufs.colNum() == 0 or bufs.rowNum() == 0):
     return emptyTermBuf
+
   else:
+    discard
     let cellws = bufs.maximizeColIt: it.width()
     let cellhs = bufs.maximizeRowIt: it.height()
 
