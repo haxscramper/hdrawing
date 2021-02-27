@@ -805,5 +805,5 @@ converter toRunes*(s: seq[seq[string]]): seq[seq[RuneSeq]] =
 converter toRunes*(s: seq[seq[seq[string]]]): seq[seq[seq[RuneSeq]]] =
   s.mapIt(it.mapIt(it.mapIt(unicode.toRunes(it))))
 
-converter toSeq2D*[T](s: seq[seq[T]]): Seq2d[T] =
-  makeSeq2D(s)
+# func toSeq2D*[T](s: seq[seq[T]]): Seq2d[T] =
+#   makeSeq2D(s)

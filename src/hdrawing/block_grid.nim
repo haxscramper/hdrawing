@@ -144,10 +144,11 @@ func toMulticell*[T](grid: Seq2D[Option[GridCell[T]]]
     result[makeArrRect(pos, cell.size)] = cell
 
 func makeCell*[T](
-  arg: T,
-  cellSize: (int, int) = (1, 1), # TODO replace with `ArrSize`
-  policies: (SizePolicy, SizePolicy) = (spExpanding, spExpanding)
-                ): GridCell[T] =
+    arg: T,
+    cellSize: (int, int) = (1, 1), # TODO replace with `ArrSize`
+    policies: (SizePolicy, SizePolicy) = (spExpanding, spExpanding)
+  ): GridCell[T] =
+
   GridCell[T](
     isItem: true,
     item: arg,
@@ -185,12 +186,8 @@ func makeGrid*[T](
   result = BlockGrid[T](grid: arg, borders: conf)
 
 func makeGrid*[T](arg: Seq2D[T], conf: TermGridConf): BlockGrid[T] =
-  BlockGrid[T](
-    grid: arg.mapIt2d(
-      makeCell(it)
-    ).toMulticell(),
-    borders: conf
-  )
+  let cells = arg.mapIt2d(makeCell[T](it))
+  BlockGrid[T](grid: cells.toMulticell(), borders: conf)
 
 func makeGrid*(strs: seq[seq[string]]): BlockGrid[StrBlock] =
   BlockGrid[StrBlock](grid:
